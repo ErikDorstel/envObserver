@@ -11,10 +11,10 @@ void getCalibration() {
   flash.end();
   if (debug) { Serial.println("Calibration Peak: " + String(calibration.peak,4) + " RMS: " + String(calibration.rms,4)); } }
 
-void setCalibration(double peak, double rms) {
+void setCalibration(double voltagePeak, double voltageRMS) {
   flash.begin("envObserver",false);
-  flash.putDouble("peak",peak*calibration.peak/325);
-  flash.putDouble("rms",rms*calibration.rms/230);
+  flash.putDouble("peak",voltagePeak*calibration.peak/325);
+  flash.putDouble("rms",voltageRMS*calibration.rms/230);
   flash.end();
   getCalibration(); }
 

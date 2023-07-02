@@ -9,14 +9,14 @@ String httpget(String request) {
     response+=String(env.voltagePeakMax,2) + ",";
     response+=String(env.voltageRmsMin,2) + ",";
     response+=String(env.voltageRmsMax,2) + ",";
-    response+=String(env.freqMin,2) + ",";
-    response+=String(env.freqMax,2);
+    response+=String(env.frequencyMin,2) + ",";
+    response+=String(env.frequencyMax,2);
     resetEnv(); }
 
   else if (request.indexOf("/getVoltage")>=0) {
     response+=String(env.voltagePeak,2) + ",";
     response+=String(env.voltageRms,2) + ",";
-    response+=String(env.freq,2); }
+    response+=String(env.frequency,2); }
 
   else if (request.indexOf("/getTemperature")>=0) {
     response+=String(bme280.readTemperature(),2); }

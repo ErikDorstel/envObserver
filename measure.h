@@ -14,17 +14,17 @@ struct envStruct {
   double voltageRms;
   double voltageRmsMin;
   double voltageRmsMax;
-  double freq;
-  double freqMin;
-  double freqMax; } env;
+  double frequency;
+  double frequencyMin;
+  double frequencyMax; } env;
 
 void resetEnv() {
   env.voltagePeakMin=1000;
   env.voltagePeakMax=0;
   env.voltageRmsMin=1000;
   env.voltageRmsMax=0;
-  env.freqMin=100;
-  env.freqMax=0; }
+  env.frequencyMin=100;
+  env.frequencyMax=0; }
 
 struct measureStruct {
   uint32_t timer;
@@ -74,25 +74,25 @@ void measureWorker() {
     measure.rawCur=ads1115.getLastConversionResults();
     measure.rawSum+=measure.rawCur;
     if (measure.rawCur>measure.rawMax) { measure.rawMax=measure.rawCur; }
-    if (measure.rawCur>=10000 && measure.polarity<=0) { measure.polarity=1;
+    if (measure.rawCur>=16000 && measure.polarity<=0) { measure.polarity=1;
       measure.phases++; if (measure.phases>2) { measure.phaseEnd=micros(); } else { measure.phaseStart=micros(); } }
-    if (measure.rawCur<10000 && measure.polarity>=0) { measure.polarity=-1; } }
+    if (measure.rawCur<16000 && measure.polarity>=0) { measure.polarity=-1; } }
 
   if (millis()>=measure.timer) {
-    double voltsPeak=ads1115.computeVolts(measure.rawMax)+0.6;
-    double voltsRms=ads1115.computeVolts(measure.rawSum/measure.counter)+0.6;
-    double freq=0; if (measure.phases>2) { freq=500000/((double)(measure.phaseEnd-measure.phaseStart)/(measure.phases-2)); }
-    env.voltagePeak=voltsPeak*325/calibration.peak;
+    double voltagePeak=ads1115.computeVolts(measure.rawMax)+0.6;
+    double voltageRms=ads1115.computeVolts(measure.rawSum/measure.counter)+0.6;
+    double frequency=0; if (measure.phases>2) { frequency=500000/((double)(measure.phaseEnd-measure.phaseStart)/(measure.phases-2)); }
+    env.voltagePeak=voltagePeak*325/calibration.peak;
     if (env.voltagePeak<env.voltagePeakMin) { env.voltagePeakMin=env.voltagePeak; }
     if (env.voltagePeak>env.voltagePeakMax) { env.voltagePeakMax=env.voltagePeak; }
-    env.voltageRms=voltsRms*230/calibration.rms;
+    env.voltageRms=voltageRms*230/calibration.rms;
     if (env.voltageRms<env.voltageRmsMin) { env.voltageRmsMin=env.voltageRms; }
     if (env.voltageRms>env.voltageRmsMax) { env.voltageRmsMax=env.voltageRms; }
-    env.freq=freq;
-    if (freq<env.freqMin) { env.freqMin=freq; }
-    if (freq>env.freqMax) { env.freqMax=freq; }
+    env.frequency=frequency;
+    if (env.frequency<env.frequencyMin) { env.frequencyMin=env.frequency; }
+    if (env.frequency>env.frequencyMax) { env.frequencyMax=env.frequency; }
     if (debug) {
       Serial.print(env.voltagePeak); Serial.print(" - ");
       Serial.print(env.voltageRms); Serial.print(" - ");
-      Serial.print(env.freq); Serial.println(); }
+      Serial.print(env.frequency); Serial.println(); }
     resetMeasure(); } }
