@@ -1,14 +1,13 @@
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
 #include <Adafruit_BME280.h>
+#include "calibrate.h"
 
 Adafruit_ADS1115 ads1115;
 TwoWire I2C2=TwoWire(1);
 Adafruit_BME280 bme280;
 
 struct envStruct {
-  double normPeak=325/2.04;
-  double normRms=230/1.39;
   double voltagePeak;
   double voltagePeakMin;
   double voltagePeakMax;
@@ -66,7 +65,7 @@ void initMeasure() {
   // ltc845 optocoupler digital input
   pinMode(34,INPUT); pinMode(35,INPUT); pinMode(36,INPUT); pinMode(39,INPUT);
 
-  resetEnv(); resetMeasure(); }
+  getCalibration(); resetEnv(); resetMeasure(); }
 
 void measureWorker() {
 
@@ -83,10 +82,10 @@ void measureWorker() {
     double voltsPeak=ads1115.computeVolts(measure.rawMax)+0.6;
     double voltsRms=ads1115.computeVolts(measure.rawSum/measure.counter)+0.6;
     double freq=0; if (measure.phases>2) { freq=500000/((double)(measure.phaseEnd-measure.phaseStart)/(measure.phases-2)); }
-    env.voltagePeak=voltsPeak*env.normPeak;
+    env.voltagePeak=voltsPeak*325/calibration.peak;
     if (env.voltagePeak<env.voltagePeakMin) { env.voltagePeakMin=env.voltagePeak; }
     if (env.voltagePeak>env.voltagePeakMax) { env.voltagePeakMax=env.voltagePeak; }
-    env.voltageRms=voltsRms*env.normRms;
+    env.voltageRms=voltsRms*230/calibration.rms;
     if (env.voltageRms<env.voltageRmsMin) { env.voltageRmsMin=env.voltageRms; }
     if (env.voltageRms>env.voltageRmsMax) { env.voltageRmsMax=env.voltageRms; }
     env.freq=freq;

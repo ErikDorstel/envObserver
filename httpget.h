@@ -33,6 +33,16 @@ String httpget(String request) {
     response+=String(!digitalRead(36),BIN) + ",";
     response+=String(!digitalRead(39),BIN); }
 
+  else if (request.indexOf("/setCalibration")>=0) {
+    setCalibration(env.voltagePeak,env.voltageRms);
+    response+=String(calibration.peak,4) + ",";
+    response+=String(calibration.rms,4); }
+
+  else if (request.indexOf("/resetCalibration")>=0) {
+    resetCalibration();
+    response+=String(calibration.peak,4) + ",";
+    response+=String(calibration.rms,4); }
+
   else {
     response+="<a href='/getId'>getId</a><br>";
     response+="<a href='/getVoltage'>getVoltage</a><br>";
@@ -40,7 +50,9 @@ String httpget(String request) {
     response+="<a href='/getTemperature'>getTemperature</a><br>";
     response+="<a href='/getPressure'>getPressure</a><br>";
     response+="<a href='/getHumidity'>getHumidity</a><br>";
-    response+="<a href='/getDigitalIn'>getDigitalIn</a><br>"; }
+    response+="<a href='/getDigitalIn'>getDigitalIn</a><br>";
+    response+="<a href='/setCalibration'>setCalibration</a><br>";
+    response+="<a href='/resetCalibration'>resetCalibration</a><br>"; }
 
   resetMeasure();
   return response; }
