@@ -33,6 +33,10 @@ String httpget(String request) {
     response+=String(!digitalRead(36),BIN) + ",";
     response+=String(!digitalRead(39),BIN); }
 
+  else if (request.indexOf("/getCalibration")>=0) {
+    response+=String(calibration.peak,4) + ",";
+    response+=String(calibration.rms,4); }
+
   else if (request.indexOf("/setCalibration")>=0) {
     setCalibration(env.voltagePeak,env.voltageRms);
     response+=String(calibration.peak,4) + ",";
@@ -51,6 +55,7 @@ String httpget(String request) {
     response+="<a href='/getPressure'>getPressure</a><br>";
     response+="<a href='/getHumidity'>getHumidity</a><br>";
     response+="<a href='/getDigitalIn'>getDigitalIn</a><br>";
+    response+="<a href='/getCalibration'>getCalibration</a><br>";
     response+="<a href='/setCalibration'>setCalibration</a><br>";
     response+="<a href='/resetCalibration'>resetCalibration</a><br>"; }
 
