@@ -1,12 +1,12 @@
 # envObserver
 ESP32 based environment monitor
 #### Features
-* uses W5500 for 100Base-T ethernet
-* uses ADS1115 16bit adc with transformer and rectifier
+* uses W5500 PHY/MAC for 100Base-T ethernet
+* uses ADS1115 16Bit ADC with transformer and rectifier
 * measures peak voltage, rms voltage and frequency
 * uses BME280 as environment sensor
-* uses LTV845 optocoupler for digital input
-* simple HTTP interface
+* uses LTV845 optocoupler for the digital inputs
+* simple HTTP polling interface
 #### GPIO
 * GPIO 23 - W5500 MOSI
 * GPIO 19 - W5500 MISO
@@ -19,9 +19,9 @@ ESP32 based environment monitor
 * GPIO 25 - ADS115 ALRT
 * GPIO 17 - BME280 SDA
 * GPIO 16 - BME280 SCL
-* GPIO 34 - LTV845 input 0
-* GPIO 35 - LTV845 input 1
-* GPIO 36 - LTV845 input 2
-* GPIO 39 - LTV845 input 3
+* GPIO 34 - LTV845 Input 0
+* GPIO 35 - LTV845 Input 1
+* GPIO 36 - LTV845 Input 2
+* GPIO 39 - LTV845 Input 3
 #### Schematic
 ![IMAGE ALT TEXT HERE](documentation/envObserver.png)
