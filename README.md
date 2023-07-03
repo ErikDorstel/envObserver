@@ -23,3 +23,5 @@ ESP32 based environment monitor
 * GPIO 35 - LTV845 input 1
 * GPIO 36 - LTV845 input 2
 * GPIO 39 - LTV845 input 3
+#### Schematic
+![IMAGE ALT TEXT HERE](documentation/envObserver.png)
