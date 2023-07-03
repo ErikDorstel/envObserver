@@ -27,15 +27,15 @@ void resetEnv() {
   env.frequencyMax=0; }
 
 struct measureStruct {
-  uint32_t timer;
+  hw_timer_t* phaseTimer=NULL;
+  uint64_t timer;
   int16_t rawCur;
   int16_t rawMax;
   int64_t rawSum;
   int counter;
   int polarity;
   int phases;
-  uint64_t phaseStart;
-  uint64_t phaseEnd; } measure;
+  uint64_t phaseDuration; } measure;
 
 void resetMeasure() {
   measure.timer=millis()+5000;
@@ -43,14 +43,16 @@ void resetMeasure() {
   measure.rawSum=0;
   measure.counter=0;
   measure.polarity=0;
-  measure.phases=0;
-  measure.phaseStart=0;
-  measure.phaseEnd=0; }
+  measure.phases=0; }
 
 volatile bool newData=false;
 void IRAM_ATTR newDataISR() { newData=true; }
 
 void initMeasure() {
+
+  // hardware timer 0
+  measure.phaseTimer=timerBegin(0,80,true);
+  timerStart(measure.phaseTimer);
 
   // ads1115 voltage adc
   if (!ads1115.begin()) { Serial.println("Failed to initialize ADS1115."); }
@@ -75,13 +77,13 @@ void measureWorker() {
     measure.rawSum+=measure.rawCur;
     if (measure.rawCur>measure.rawMax) { measure.rawMax=measure.rawCur; }
     if (measure.rawCur>=16000 && measure.polarity<=0) { measure.polarity=1;
-      measure.phases++; if (measure.phases>2) { measure.phaseEnd=micros(); } else { measure.phaseStart=micros(); } }
+      measure.phases++; if (measure.phases>2) { measure.phaseDuration=timerRead(measure.phaseTimer); } else { timerWrite(measure.phaseTimer,0x0ULL); } }
     if (measure.rawCur<16000 && measure.polarity>=0) { measure.polarity=-1; } }
 
   if (millis()>=measure.timer) {
     double voltagePeak=ads1115.computeVolts(measure.rawMax)+0.6;
     double voltageRms=ads1115.computeVolts(measure.rawSum/measure.counter)+0.6;
-    double frequency=0; if (measure.phases>2) { frequency=500000/((double)(measure.phaseEnd-measure.phaseStart)/(measure.phases-2)); }
+    double frequency=0; if (measure.phases>2) { frequency=500000/((double)measure.phaseDuration/(measure.phases-2)); }
     env.voltagePeak=voltagePeak*325/calibration.peak;
     if (env.voltagePeak<env.voltagePeakMin) { env.voltagePeakMin=env.voltagePeak; }
     if (env.voltagePeak>env.voltagePeakMax) { env.voltagePeakMax=env.voltagePeak; }
