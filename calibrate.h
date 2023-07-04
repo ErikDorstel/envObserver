@@ -2,7 +2,7 @@
 
 Preferences flash;
 
-struct calibrationStruct { double peak; double rms; double peakDefault=2.04; double rmsDefault=1.39; } calibration;
+struct calibrationStruct { double peak; double rms; double peakDefault=2.1; double rmsDefault=1.4; } calibration;
 
 void getCalibration() {
   flash.begin("envObserver",true);
