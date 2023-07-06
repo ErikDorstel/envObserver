@@ -7,6 +7,26 @@ Adafruit_ADS1115 ads1115;
 TwoWire I2C2=TwoWire(1);
 Adafruit_BME280 bme280;
 
+httpClient httpClientRequest;
+
+struct envRangeStruct {
+  uint16_t measures;
+  double voltagePeakMin;
+  double voltagePeakMax;
+  double voltageRmsMin;
+  double voltageRmsMax;
+  double frequencyMin;
+  double frequencyMax; } envRange;
+
+void resetEnvRange() {
+  envRange.measures=0;
+  envRange.voltagePeakMin=1000;
+  envRange.voltagePeakMax=0;
+  envRange.voltageRmsMin=1000;
+  envRange.voltageRmsMax=0;
+  envRange.frequencyMin=100;
+  envRange.frequencyMax=0; }
+
 struct envStruct {
   double voltagePeak;
   double voltagePeakMin;
@@ -67,7 +87,7 @@ void initMeasure() {
   // ltc845 optocoupler digital input
   pinMode(34,INPUT); pinMode(35,INPUT); pinMode(36,INPUT); pinMode(39,INPUT);
 
-  getCalibration(); resetEnv(); resetMeasure(); }
+  getCalibration(); resetEnv(); resetEnvRange(); resetMeasure(); }
 
 void measureWorker() {
 
@@ -81,20 +101,39 @@ void measureWorker() {
     if (measure.rawCur<16000 && measure.polarity>=0) { measure.polarity=-1; } }
 
   if (millis()>=measure.timer) {
+    envRange.measures++;
     double voltagePeak=ads1115.computeVolts(measure.rawMax)+0.6;
     double voltageRms=ads1115.computeVolts(measure.rawSum/measure.counter)+0.6;
     double frequency=0; if (measure.phases>2) { frequency=500000/((double)measure.phaseDuration/(measure.phases-2)); }
     env.voltagePeak=voltagePeak*325/calibration.peak;
     if (env.voltagePeak<env.voltagePeakMin) { env.voltagePeakMin=env.voltagePeak; }
     if (env.voltagePeak>env.voltagePeakMax) { env.voltagePeakMax=env.voltagePeak; }
+    if (env.voltagePeak<envRange.voltagePeakMin) { envRange.voltagePeakMin=env.voltagePeak; }
+    if (env.voltagePeak>envRange.voltagePeakMax) { envRange.voltagePeakMax=env.voltagePeak; }
     env.voltageRms=voltageRms*230/calibration.rms;
     if (env.voltageRms<env.voltageRmsMin) { env.voltageRmsMin=env.voltageRms; }
     if (env.voltageRms>env.voltageRmsMax) { env.voltageRmsMax=env.voltageRms; }
+    if (env.voltageRms<envRange.voltageRmsMin) { envRange.voltageRmsMin=env.voltageRms; }
+    if (env.voltageRms>envRange.voltageRmsMax) { envRange.voltageRmsMax=env.voltageRms; }
     env.frequency=frequency;
     if (env.frequency<env.frequencyMin) { env.frequencyMin=env.frequency; }
     if (env.frequency>env.frequencyMax) { env.frequencyMax=env.frequency; }
+    if (env.frequency<envRange.frequencyMin) { envRange.frequencyMin=env.frequency; }
+    if (env.frequency>envRange.frequencyMax) { envRange.frequencyMax=env.frequency; }
+
+    int inputs=((!digitalRead(34))*1)+((!digitalRead(35))*2)+((!digitalRead(36))*4)+((!digitalRead(39))*8);
+    String update="update=" + String(env.voltagePeak) + "," + String(env.voltageRms) + "," + String(env.frequency);
+    update+="," + String(bme280.readTemperature()) + "," + String(bme280.readPressure()/100) + "," + String(bme280.readHumidity()) + "," + String(inputs);
+    if (envRange.measures>=120) {
+      update+="," + String(envRange.voltagePeakMin) + "," + String(envRange.voltagePeakMax);
+      update+="," + String(envRange.voltageRmsMin) + "," + String(envRange.voltageRmsMax);
+      update+="," + String(envRange.frequencyMin) + "," + String(envRange.frequencyMax); }
+    httpClientRequest.post("office.dorstel.de","/receiver.php",update);
+    if (envRange.measures>=120 && httpClientRequest.responseStatus==200) { resetEnvRange(); }
+
     if (debug) {
       Serial.print(env.voltagePeak); Serial.print(" - ");
       Serial.print(env.voltageRms); Serial.print(" - ");
       Serial.print(env.frequency); Serial.println(); }
+
     resetMeasure(); } }
