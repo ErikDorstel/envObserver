@@ -27,3 +27,28 @@ void httpWorker() {
           else { currentLine=""; } }
         else if (c!='\r') { currentLine+=c; } } }
     header = ""; httpClient.stop(); } }
+
+class httpClient {
+  public:
+  EthernetClient httpRequest;
+  int responseStatus;
+  String responseHeader;
+  String responseBody;
+  void get(String host,String path="/",String value="") { send("GET",host,path,value); }
+  void post(String host,String path="/",String value="") { send("POST",host,path,value); }
+  void send(String type,String host,String path,String value) {
+    httpRequest.connect(host.c_str(),80);
+    httpRequest.println(type + " " + path + " HTTP/1.0");
+    httpRequest.println("Host: " + host);
+    httpRequest.println("Accept: text/html");
+    httpRequest.println("User-Agent: Mozilla/5.0");
+    httpRequest.println();
+    if (value.length()) { httpRequest.println(value); }
+    responseHeader=""; responseBody=""; String line=""; bool isHeader=true; responseStatus=-1;
+    while (httpRequest.connected()) { if (httpRequest.available()) {
+      char c=httpRequest.read(); line+=c; if (c=='\n') {
+        if (line.length()<3) { isHeader=false; }
+        else { if (isHeader) { responseHeader+=line; } else { responseBody+=line; } } line=""; } } }
+    if (responseHeader.startsWith("HTTP/")) {
+      int a=responseHeader.indexOf(" ")+1; int b=responseHeader.indexOf(" ",a); responseStatus=responseHeader.substring(a,b).toInt(); }
+    httpRequest.stop(); } };
