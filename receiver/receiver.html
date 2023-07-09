@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<title>envObserver</title>
+<meta name="author" content="Erik Dorstel">
+<meta name="generator" content="vi">
+<meta name="repository" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<style type="text/css">
+.footer { font-family:Arial,sans-serif; font-size:1em; text-decoration:none; padding:0em; margin:0.5em; outline:none; color:#606060; }
+.button { font-family:Arial,sans-serif; font-size:1em; text-decoration:none; padding:0.2em 0.5em; margin:0.5em 0em 0.5em 0.5em; outline:none;
+          color:#ffffff; background-color:#a0a0a0; cursor:pointer; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+<script>
+function initChart() {
+  ajaxObj=new XMLHttpRequest; ajaxObj.open("GET","receiver.php",false);
+  ajaxObj.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+  ajaxObj.setRequestHeader("Cache-Control","max-age=0");
+  ajaxObj.send(); arraydata=ajaxObj.responseText.trim().split("\n");
+
+  labels=[]; data1=[]; data2=[]; data3=[]; data4=[]; data5=[]; data6=[];
+  data7=[]; data8=[]; data9=[]; data10=[]; data11=[]; data12=[]; data13=[];
+  for (index=0;index<arraydata.length;index++) {
+    labels.push(new Date(arraydata[index].split(",")[0]*1000).toLocaleString());
+    data1.push(arraydata[index].split(",")[1]*1);
+    data2.push(arraydata[index].split(",")[2]*1);
+    data3.push(arraydata[index].split(",")[3]*1);
+    data4.push(arraydata[index].split(",")[4]*1);
+    data5.push(arraydata[index].split(",")[5]*1);
+    data6.push(arraydata[index].split(",")[6]*1);
+    data7.push(arraydata[index].split(",")[7]*1);
+    data8.push(arraydata[index].split(",")[8]*1);
+    data9.push(arraydata[index].split(",")[9]*1);
+    data10.push(arraydata[index].split(",")[10]*1);
+    data11.push(arraydata[index].split(",")[11]*1);
+    data12.push(arraydata[index].split(",")[12]*1);
+    data13.push(arraydata[index].split(",")[13]*1); }
+
+  data=""; config="";
+  getChart();
+  myChart=new Chart(document.getElementById('myChart'),config); }
+
+function reload() {
+  myChart.destroy();
+  initChart(); }
+
+function toogleMinMax() {
+  if (myChart.data.datasets[7].hidden) {
+    myChart.data.datasets[7].hidden=false; myChart.data.datasets[8].hidden=false;
+    myChart.data.datasets[9].hidden=false; myChart.data.datasets[10].hidden=false;
+    myChart.data.datasets[11].hidden=false; myChart.data.datasets[12].hidden=false; }
+  else {
+    myChart.data.datasets[7].hidden=true; myChart.data.datasets[8].hidden=true;
+    myChart.data.datasets[9].hidden=true; myChart.data.datasets[10].hidden=true;
+    myChart.data.datasets[11].hidden=true; myChart.data.datasets[12].hidden=true; }
+  myChart.update(); }
+
+function getChart() {
+  data={labels:labels,datasets:[{
+    label:'AC Peak',
+    backgroundColor:'rgb(200,80,80)',borderColor:'rgb(200,80,80)',borderWidth:2,
+    yAxisID:'y0',xAxisID:'x',data:data1,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC RMS',
+    backgroundColor:'rgb(80,80,200)',borderColor:'rgb(80,80,200)',borderWidth:2,
+    yAxisID:'y0',xAxisID:'x',data:data2,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC Frequency',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:2,
+    yAxisID:'y1',xAxisID:'x',data:data3,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'Temperature',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:2,
+    yAxisID:'y1',xAxisID:'x',data:data4,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'Pressure',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:2,
+    yAxisID:'y2',xAxisID:'x',data:data5,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'Humidity',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:2,
+    yAxisID:'y1',xAxisID:'x',data:data6,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'Inputs',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:2,
+    yAxisID:'y1',xAxisID:'x',data:data7,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC Peak Min',
+    backgroundColor:'rgb(200,80,80)',borderColor:'rgb(200,80,80)',borderWidth:1,pointStyle:'point',pointRadius:2,
+    yAxisID:'y0',xAxisID:'x',data:data8,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC Peak Max',
+    backgroundColor:'rgb(200,80,80)',borderColor:'rgb(200,80,80)',borderWidth:1,pointStyle:'point',pointRadius:2,
+    yAxisID:'y0',xAxisID:'x',data:data9,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC RMS Min',
+    backgroundColor:'rgb(80,80,200)',borderColor:'rgb(80,80,200)',borderWidth:1,pointStyle:'point',pointRadius:2,
+    yAxisID:'y0',xAxisID:'x',data:data10,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC RMS Max',
+    backgroundColor:'rgb(80,80,200)',borderColor:'rgb(80,80,200)',borderWidth:1,pointStyle:'point',pointRadius:2,
+    yAxisID:'y0',xAxisID:'x',data:data11,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC Frequency Min',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:1,pointStyle:'point',pointRadius:2,
+    yAxisID:'y1',xAxisID:'x',data:data12,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'AC Frequency Max',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:1,pointStyle:'point',pointRadius:2,
+    yAxisID:'y1',xAxisID:'x',data:data13,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4}]};
+
+  config={type:'line',data,options:{
+    interaction:{mode:'nearest',intersect:false},
+    radius:0,scales:{
+      x:{min:function(){if(labels.length>720){return labels.length-720;}else{return 0;}}},
+      y0:{position:"left",min:0,max:450,grid:{drawOnChartArea:true}},
+      y1:{position:"right",min:0,max:80,grid:{drawOnChartArea:false}},
+      y2:{position:"right",min:0,max:1200,grid:{drawOnChartArea:false}}},
+    plugins:{zoom:{
+      pan:{enabled:true,mode:'x'},
+      zoom:{mode:'x',
+        wheel:{enabled:true},
+        pinch:{enabled:true}}}}}}; }
+
+</script></head>
+<body id="display" onload="initChart();">
+<div><canvas id="myChart"></canvas></div>
+<a class="button" onclick="reload();">Reload</a>
+<a class="button" onclick="toogleMinMax();">Toogle Min/Max</a>
+</body></html>
