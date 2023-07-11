@@ -115,7 +115,7 @@ function getChart() {
 
   config={type:'line',data,options:{
     interaction:{mode:'nearest',intersect:false},
-    radius:0,scales:{
+    resizeDelay:50,radius:0,scales:{
       x:{min:function(){if(labels.length>720){return labels.length-720;}else{return 0;}}},
       y0:{position:"left",min:0,max:450,grid:{drawOnChartArea:true}},
       y1:{position:"right",min:0,max:80,grid:{drawOnChartArea:false}},
