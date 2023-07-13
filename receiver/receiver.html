@@ -20,9 +20,17 @@ function initChart() {
   ajaxObj.setRequestHeader("Cache-Control","max-age=0");
   ajaxObj.send(); arraydata=ajaxObj.responseText.trim().split("\n");
 
-  labels=[]; data1=[]; data2=[]; data3=[]; data4=[]; data5=[]; data6=[];
-  data7=[]; data8=[]; data9=[]; data10=[]; data11=[]; data12=[]; data13=[];
+  oldtime=0; labels=[]; data1=[]; data2=[]; data3=[]; data4=[]; data5=[]; data6=[];
+  data7=[]; data8=[]; data9=[]; data10=[]; data11=[]; data12=[]; data13=[]; data14=[];
   for (index=0;index<arraydata.length;index++) {
+
+    nowtime=arraydata[index].split(",")[0]*1;
+    if (index>0 && (nowtime-oldtime)>7) { labels.push("Missing Data");
+      data1.push(NaN); data2.push(NaN); data3.push(NaN); data4.push(NaN); data5.push(NaN); data6.push(NaN); data7.push(NaN);
+      data8.push(NaN); data9.push(NaN); data10.push(NaN); data11.push(NaN); data12.push(NaN); data13.push(NaN);
+      data14.push(nowtime-oldtime); }
+    oldtime=nowtime;
+
     labels.push(new Date(arraydata[index].split(",")[0]*1000).toLocaleString());
     data1.push(arraydata[index].split(",")[1]*1);
     data2.push(arraydata[index].split(",")[2]*1);
@@ -36,7 +44,8 @@ function initChart() {
     data10.push(arraydata[index].split(",")[10]*1);
     data11.push(arraydata[index].split(",")[11]*1);
     data12.push(arraydata[index].split(",")[12]*1);
-    data13.push(arraydata[index].split(",")[13]*1); }
+    data13.push(arraydata[index].split(",")[13]*1);
+    data14.push(-10); }
 
   data=""; config="";
   getChart();
@@ -111,6 +120,10 @@ function getChart() {
     label:'AC Frequency Max',
     backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:1,pointStyle:'point',pointRadius:2,
     yAxisID:'y1',xAxisID:'x',data:data13,hidden:true,spanGaps:true,
+    cubicInterpolationMode:'monotone',tension:0.4},{
+    label:'Missing Data',
+    backgroundColor:'rgb(150,150,150)',borderColor:'rgb(150,150,150)',borderWidth:2,
+    yAxisID:'y1',xAxisID:'x',data:data14,
     cubicInterpolationMode:'monotone',tension:0.4}]};
 
   config={type:'line',data,options:{
