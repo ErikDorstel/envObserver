@@ -1,7 +1,24 @@
 String httpServerRequest(String request) {
   String response="";
 
-  if (request.indexOf("/getId")>=0) {
+  if (request.indexOf("/getStatus")>=0) {
+    response+=String(ESP.getEfuseMac(),HEX) + ",";
+    response+=String(env.voltagePeakMin,2) + ",";
+    response+=String(env.voltagePeakMax,2) + ",";
+    response+=String(env.voltageRmsMin,2) + ",";
+    response+=String(env.voltageRmsMax,2) + ",";
+    response+=String(env.frequencyMin,2) + ",";
+    response+=String(env.frequencyMax,2) + ",";
+    response+=String(bme280.readTemperature(),2) + ",";
+    response+=String(bme280.readPressure()/100,2) + ",";
+    response+=String(bme280.readHumidity(),2) + ",";
+    response+=String(!digitalRead(34),BIN) + ",";
+    response+=String(!digitalRead(35),BIN) + ",";
+    response+=String(!digitalRead(36),BIN) + ",";
+    response+=String(!digitalRead(39),BIN);    
+    resetEnv(); }
+
+  else if (request.indexOf("/getId")>=0) {
     response+=String(ESP.getEfuseMac(),HEX); }
 
   else if (request.indexOf("/getVoltageRange")>=0) {
@@ -48,6 +65,7 @@ String httpServerRequest(String request) {
     response+=String(calibration.rms,4); }
 
   else {
+    response+="<a href='/getStatus'>getStatus</a><br>";
     response+="<a href='/getId'>getId</a><br>";
     response+="<a href='/getVoltage'>getVoltage</a><br>";
     response+="<a href='/getVoltageRange'>getVoltageRange</a><br>";
