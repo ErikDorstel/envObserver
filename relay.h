@@ -16,7 +16,7 @@ void setRelay(int channel, bool state) {
   if (channel==3 && state==true) { digitalWrite(relayD,HIGH); relay.state[3]=state; if (debug) { Serial.println("Relay Chan: 3, State: On"); } } }
 
 void initRelay() {
-  //pinMode(relayA,OUTPUT); setRelay(0,false);
-  //pinMode(relayB,OUTPUT); setRelay(1,false);
+  pinMode(relayA,OUTPUT); setRelay(0,false);
+  pinMode(relayB,OUTPUT); setRelay(1,false);
   pinMode(relayC,OUTPUT); setRelay(2,false);
   pinMode(relayD,OUTPUT); setRelay(3,false); }

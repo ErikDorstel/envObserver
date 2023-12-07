@@ -80,6 +80,8 @@ String httpServerRequest(String request) {
     response+=String(relay.state[2]) + ",";
     response+=String(relay.state[3]); }
 
+  else if (request.indexOf("/favicon.ico")>=0) { }
+
   else {
     response+="<a href='/getStatus'>getStatus</a><br>";
     response+="<a href='/getId'>getId</a><br>";
