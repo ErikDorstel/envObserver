@@ -3,6 +3,14 @@
 #include <Adafruit_BME280.h>
 #include "calibrate.h"
 
+#define inputA 34
+#define inputB 35
+#define inputC 36
+#define inputD 39
+#define bme280SDA 17
+#define bme280SCL 16
+#define ads1115Int 25
+
 Adafruit_ADS1115 ads1115;
 TwoWire I2C2=TwoWire(1);
 Adafruit_BME280 bme280;
@@ -77,15 +85,15 @@ void initMeasure() {
   // ads1115 voltage adc
   if (!ads1115.begin()) { Serial.println("Failed to initialize ADS1115."); }
   ads1115.setGain(GAIN_TWO); ads1115.setDataRate(RATE_ADS1115_860SPS);
-  pinMode(25,INPUT); attachInterrupt(25,newDataISR,FALLING);
+  pinMode(ads1115Int,INPUT); attachInterrupt(ads1115Int,newDataISR,FALLING);
   ads1115.startADCReading(ADS1X15_REG_CONFIG_MUX_SINGLE_0,true);
 
   // bme280 environment sensor
-  I2C2.begin(17,16);
+  I2C2.begin(bme280SDA,bme280SCL);
   if (!bme280.begin(0x76,&I2C2)) { Serial.println("Failed to initialize BME280."); }
 
   // ltc845 optocoupler digital input
-  pinMode(34,INPUT); pinMode(35,INPUT); pinMode(36,INPUT); pinMode(39,INPUT);
+  pinMode(inputA,INPUT); pinMode(inputB,INPUT); pinMode(inputC,INPUT); pinMode(inputD,INPUT);
 
   getCalibration(); resetEnv(); resetEnvRange(); resetMeasure(); }
 
@@ -121,14 +129,14 @@ void measureWorker() {
     if (env.frequency<envRange.frequencyMin) { envRange.frequencyMin=env.frequency; }
     if (env.frequency>envRange.frequencyMax) { envRange.frequencyMax=env.frequency; }
 
-    int inputs=((!digitalRead(34))*1)+((!digitalRead(35))*2)+((!digitalRead(36))*4)+((!digitalRead(39))*8);
+    int inputs=((!digitalRead(inputA))*1)+((!digitalRead(inputB))*2)+((!digitalRead(inputC))*4)+((!digitalRead(inputD))*8);
     String update="update=" + String(env.voltagePeak) + "," + String(env.voltageRms) + "," + String(env.frequency);
     update+="," + String(bme280.readTemperature()) + "," + String(bme280.readPressure()/100) + "," + String(bme280.readHumidity()) + "," + String(inputs);
     if (envRange.measures>=120) {
       update+="," + String(envRange.voltagePeakMin) + "," + String(envRange.voltagePeakMax);
       update+="," + String(envRange.voltageRmsMin) + "," + String(envRange.voltageRmsMax);
       update+="," + String(envRange.frequencyMin) + "," + String(envRange.frequencyMax); }
-    httpClientRequest.post("office.dorstel.de","/receiver.php",update);
+    httpClientRequest.post(httpHost,httpPath,update);
     if (envRange.measures>=120 && httpClientRequest.responseStatus==200) { resetEnvRange(); }
 
     if (debug) {
