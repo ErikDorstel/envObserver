@@ -15,7 +15,11 @@ String httpServerRequest(String request) {
     response+=String(!digitalRead(inputA),BIN) + ",";
     response+=String(!digitalRead(inputB),BIN) + ",";
     response+=String(!digitalRead(inputC),BIN) + ",";
-    response+=String(!digitalRead(inputD),BIN);    
+    response+=String(!digitalRead(inputD),BIN) + ",";
+    response+=String(relay.state[0]) + ",";
+    response+=String(relay.state[1]) + ",";
+    response+=String(relay.state[2]) + ",";
+    response+=String(relay.state[3]);
     resetEnv(); }
 
   else if (request.indexOf("/getId")>=0) {
