@@ -7,6 +7,7 @@ ESP32 based environment monitor
 * uses BME280 as environment sensor
 * uses LTV845 optocoupler for the digital inputs
 * simple HTTP polling interface
+* two channel relay output
 #### GPIO W5500 (SPI)
 * GPIO 23 - MOSI
 * GPIO 19 - MISO
@@ -26,9 +27,14 @@ ESP32 based environment monitor
 * GPIO 35 - Input 1
 * GPIO 36 - Input 2
 * GPIO 39 - Input 3
+#### GPIO relay output
+* GPIO 32 - Output 0
+* GPIO 33 - Output 1
 #### Development Hardware
 ![IMAGE ALT TEXT HERE](https://www.dorstel.de/github/envObserver_a_v1.0.png)
 #### Schematic
 ![IMAGE ALT TEXT HERE](documentation/envObserver.png)
+#### Water Sensor
+![IMAGE ALT TEXT HERE](documentation/waterSensor.png)
 #### Web UI
 ![IMAGE ALT TEXT HERE](documentation/webui.png)
