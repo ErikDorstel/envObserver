@@ -59,6 +59,7 @@ struct measureStruct {
   uint64_t timer;
   int16_t rawCur;
   int16_t rawMax;
+  int16_t rawMin;
   int64_t rawSum;
   int counter;
   int polarity;
@@ -67,7 +68,8 @@ struct measureStruct {
 
 void resetMeasure() {
   measure.timer=millis()+5000;
-  measure.rawMax=-32768;
+  measure.rawMax=0;
+  measure.rawMin=0;
   measure.rawSum=0;
   measure.counter=0;
   measure.polarity=0;
@@ -86,7 +88,7 @@ void initMeasure() {
   if (!ads1115.begin()) { Serial.println("Failed to initialize ADS1115."); }
   ads1115.setGain(GAIN_TWO); ads1115.setDataRate(RATE_ADS1115_860SPS);
   pinMode(ads1115Int,INPUT); attachInterrupt(ads1115Int,newDataISR,FALLING);
-  ads1115.startADCReading(ADS1X15_REG_CONFIG_MUX_SINGLE_0,true);
+  ads1115.startADCReading(ADS1X15_REG_CONFIG_MUX_DIFF_0_1,true);
 
   // bme280 environment sensor
   I2C2.begin(bme280SDA,bme280SCL);
@@ -102,23 +104,24 @@ void measureWorker() {
   if (newData) {
     newData=false; measure.counter++;
     measure.rawCur=ads1115.getLastConversionResults();
-    measure.rawSum+=measure.rawCur;
+    measure.rawSum+=abs(measure.rawCur);
     if (measure.rawCur>measure.rawMax) { measure.rawMax=measure.rawCur; }
-    if (measure.rawCur>=16000 && measure.polarity<=0) { measure.polarity=1;
-      measure.phases++; if (measure.phases>2) { measure.phaseDuration=timerRead(measure.phaseTimer); } else { timerWrite(measure.phaseTimer,0x0ULL); } }
-    if (measure.rawCur<16000 && measure.polarity>=0) { measure.polarity=-1; } }
+    if (measure.rawCur<measure.rawMin) { measure.rawMin=measure.rawCur; }
+    if (measure.rawCur>1000 && measure.polarity<=0) { measure.polarity=1; measure.phases++;
+      if (measure.phases>2) { measure.phaseDuration=timerRead(measure.phaseTimer); } else { timerWrite(measure.phaseTimer,0x0ULL); } }
+    if (measure.rawCur<-1000 && measure.polarity>=0) { measure.polarity=-1; } }
 
   if (millis()>=measure.timer) {
     envRange.measures++;
-    double voltagePeak=ads1115.computeVolts(measure.rawMax)+0.6;
-    double voltageRms=ads1115.computeVolts(measure.rawSum/measure.counter)+0.6;
-    double frequency=0; if (measure.phases>2) { frequency=500000/((double)measure.phaseDuration/(measure.phases-2)); }
-    env.voltagePeak=voltagePeak*325/calibration.peak;
+    double voltagePeak=ads1115.computeVolts(measure.rawMax)-ads1115.computeVolts(measure.rawMin);
+    double voltageRms=ads1115.computeVolts(measure.rawSum/measure.counter);
+    double frequency=0; if (measure.phases>2) { frequency=1000000/((double)measure.phaseDuration/(measure.phases-2)); }
+    env.voltagePeak=voltagePeak*calibration.peak;
     if (env.voltagePeak<env.voltagePeakMin) { env.voltagePeakMin=env.voltagePeak; }
     if (env.voltagePeak>env.voltagePeakMax) { env.voltagePeakMax=env.voltagePeak; }
     if (env.voltagePeak<envRange.voltagePeakMin) { envRange.voltagePeakMin=env.voltagePeak; }
     if (env.voltagePeak>envRange.voltagePeakMax) { envRange.voltagePeakMax=env.voltagePeak; }
-    env.voltageRms=voltageRms*230/calibration.rms;
+    env.voltageRms=voltageRms*calibration.rms;
     if (env.voltageRms<env.voltageRmsMin) { env.voltageRmsMin=env.voltageRms; }
     if (env.voltageRms>env.voltageRmsMax) { env.voltageRmsMax=env.voltageRms; }
     if (env.voltageRms<envRange.voltageRmsMin) { envRange.voltageRmsMin=env.voltageRms; }

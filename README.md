@@ -13,8 +13,6 @@ ESP32 based environment monitor
 * GPIO 19 - MISO
 * GPIO 18 - CLK
 * GPIO  5 - CS
-* GPIO 26 - INT
-* GPIO 27 - RST
 #### GPIO ADS1115 (I2C)
 * GPIO 21 - SDA
 * GPIO 22 - SCL

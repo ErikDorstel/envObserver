@@ -17,9 +17,7 @@ String httpServerRequest(String request) {
     response+=String(!digitalRead(inputC),BIN) + ",";
     response+=String(!digitalRead(inputD),BIN) + ",";
     response+=String(relay.state[0]) + ",";
-    response+=String(relay.state[1]) + ",";
-    response+=String(relay.state[2]) + ",";
-    response+=String(relay.state[3]);
+    response+=String(relay.state[1]);
     resetEnv(); }
 
   else if (request.indexOf("/getId")>=0) {
@@ -74,15 +72,11 @@ String httpServerRequest(String request) {
       int channel=request.substring(a,b-1).toInt(); int state=request.substring(b).toInt();
       setRelay(channel,state); }
     response+=String(relay.state[0]) + ",";
-    response+=String(relay.state[1]) + ",";
-    response+=String(relay.state[2]) + ",";
-    response+=String(relay.state[3]); }
+    response+=String(relay.state[1]); }
 
   else if (request.indexOf("/getRelay")>=0) {
     response+=String(relay.state[0]) + ",";
-    response+=String(relay.state[1]) + ",";
-    response+=String(relay.state[2]) + ",";
-    response+=String(relay.state[3]); }
+    response+=String(relay.state[1]); }
 
   else if (request.indexOf("/favicon.ico")>=0) { }
 
@@ -102,10 +96,6 @@ String httpServerRequest(String request) {
     response+="<a href='/setRelay,0,1'>setRelay,0,1</a><br>";
     response+="<a href='/setRelay,1,0'>setRelay,1,0</a><br>";
     response+="<a href='/setRelay,1,1'>setRelay,1,1</a><br>";
-    response+="<a href='/setRelay,2,0'>setRelay,2,0</a><br>";
-    response+="<a href='/setRelay,2,1'>setRelay,2,1</a><br>";
-    response+="<a href='/setRelay,3,0'>setRelay,3,0</a><br>";
-    response+="<a href='/setRelay,3,1'>setRelay,3,1</a><br>";
     response+="<a href='/getRelay'>getRelay</a><br>"; }
 
   resetMeasure();

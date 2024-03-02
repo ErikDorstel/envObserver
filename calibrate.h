@@ -2,7 +2,7 @@
 
 Preferences flash;
 
-struct calibrationStruct { double peak; double rms; double peakDefault=2.1; double rmsDefault=1.4; } calibration;
+struct calibrationStruct { double peak; double rms; double peakDefault=112; double rmsDefault=248; } calibration;
 
 void getCalibration() {
   flash.begin("envObserver",true);
@@ -13,8 +13,8 @@ void getCalibration() {
 
 void setCalibration(double voltagePeak, double voltageRMS) {
   flash.begin("envObserver",false);
-  flash.putDouble("peak",voltagePeak*calibration.peak/325);
-  flash.putDouble("rms",voltageRMS*calibration.rms/230);
+  flash.putDouble("peak",calibration.peak/voltagePeak*325);
+  flash.putDouble("rms",calibration.rms/voltageRMS*230);
   flash.end();
   getCalibration(); }
 
