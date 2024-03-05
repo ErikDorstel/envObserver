@@ -29,9 +29,9 @@ ESP32 based environment monitor
 * GPIO 32 - Output 0
 * GPIO 33 - Output 1
 #### Development Hardware
-![IMAGE ALT TEXT HERE](https://www.dorstel.de/github/envObserver_a_v1.0.png)
+![IMAGE ALT TEXT HERE](documentation/envObserver_a.png)
 #### Schematic
-![IMAGE ALT TEXT HERE](documentation/envObserver.png)
+![IMAGE ALT TEXT HERE](documentation/envObserver_b.png)
 #### Water Sensor
 ![IMAGE ALT TEXT HERE](documentation/waterSensor.png)
 #### Web UI
